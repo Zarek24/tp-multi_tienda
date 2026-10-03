@@ -1,0 +1,9 @@
+# Compilados C++
+*.o
+*.out
+*.exe
+multitienda
+
+# IDE / Editor
+.vscode/
+.idea/
