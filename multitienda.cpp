@@ -52,7 +52,6 @@ int main() {
 
   registrar_Tiendas(nombres, numTiendas);
   registrar_Ventas(nombres, ventas, numTiendas, numDias);
-  guardar_Datos(nombres, ventas, numTiendas, numDias);
 
   limpiar_Pantalla();
 
