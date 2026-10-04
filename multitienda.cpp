@@ -22,7 +22,6 @@ void guardar_Datos(string *nombres, float **ventas, int numTiendas,
                    int numDias);
 
 void limpiar_Pantalla();
-void pausar();
 
 int main() {
   // Configuracion global de manipuladores de flujo para 2 decimales
@@ -55,9 +54,9 @@ int main() {
   registrar_Ventas(nombres, ventas, numTiendas, numDias);
   guardar_Datos(nombres, ventas, numTiendas, numDias);
 
-  do {
-    limpiar_Pantalla();
+  limpiar_Pantalla();
 
+  do {
     cout << "\n========= Menu ===============\n\n";
     cout << "1. Mostrar tiendas por venta\n";
     cout << "2. Mostrar promedio de ventas\n";
@@ -71,28 +70,23 @@ int main() {
     switch (opcion) {
     case 1:
       ver_Ventas(nombres, ventas, numTiendas, numDias);
-      pausar();
       break;
 
     case 2:
       ver_Promedio(nombres, ventas, numTiendas, numDias);
-      pausar();
       break;
 
     case 3:
       ver_Mayor(nombres, ventas, numTiendas, numDias);
-      pausar();
       break;
 
     case 4:
       ver_Menor(nombres, ventas, numTiendas, numDias);
-      pausar();
       break;
 
     case 5:
       guardar_Datos(nombres, ventas, numTiendas, numDias);
       cout << "\nDatos guardados correctamente en ventas.txt\n";
-      pausar();
       break;
 
     case 6:
@@ -101,8 +95,7 @@ int main() {
 
     default:
       cout << "\nOpcion invalida.\n";
-      cout<<"Ingrese una opcion valida por favor.\n";
-      pausar();
+      cout << "Ingrese una opcion valida por favor.\n";
     }
 
   } while (opcion != 6);
@@ -123,12 +116,6 @@ void limpiar_Pantalla() {
 #else
   system("clear");
 #endif
-}
-
-void pausar() {
-  cout << "\nPresione Enter para continuar...";
-  cin.ignore();
-  cin.get();
 }
 
 void registrar_Tiendas(string *nombres, int numTiendas) {
@@ -164,7 +151,7 @@ void ver_Ventas(string *nombres, float **ventas, int numTiendas, int numDias) {
       total = total + ventas[i][j];
     }
 
-    cout << nombres[i] << "\t\tS/ " << fixed << setprecision(2) << total << "\n";
+    cout << nombres[i] << "\t\tS/ " << total << "\n";
   }
 
   cout << "===========================\n";
@@ -185,8 +172,7 @@ void ver_Promedio(string *nombres, float **ventas, int numTiendas,
 
     float promedio = total / numDias;
 
-    cout << nombres[i] << "\t\tS/ " << fixed << setprecision(2) << promedio
-         << "\n";
+    cout << nombres[i] << "\t\tS/ " << promedio << "\n";
   }
 
   cout << "===========================\n";
@@ -211,7 +197,7 @@ void ver_Mayor(string *nombres, float **ventas, int numTiendas, int numDias) {
 
   cout << "\n=== La tienda mas rentable ===\n";
   cout << "Tienda\t\t: " << nombres[posicion] << "\n";
-  cout << "Venta total\t: S/ " << fixed << setprecision(2) << mayor << "\n";
+  cout << "Venta total\t: S/ " << mayor << "\n";
   cout << "===============================\n";
 }
 
@@ -234,7 +220,7 @@ void ver_Menor(string *nombres, float **ventas, int numTiendas, int numDias) {
 
   cout << "\n=== Menor venta ===\n";
   cout << "Tienda\t\t: " << nombres[posicion] << "\n";
-  cout << "Venta total\t: S/ " << fixed << setprecision(2) << menor << "\n";
+  cout << "Venta total\t: S/ " << menor << "\n";
   cout << "===============================\n";
 }
 
