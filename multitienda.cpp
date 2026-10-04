@@ -58,11 +58,11 @@ int main() {
   do {
     limpiar_Pantalla();
 
-    cout << "\n========= MENU ===============\n\n";
+    cout << "\n========= Menu ===============\n\n";
     cout << "1. Mostrar tiendas por venta\n";
     cout << "2. Mostrar promedio de ventas\n";
-    cout << "3. Tienda mas rentable\n";
-    cout << "4. Tienda menor venta\n";
+    cout << "3. Mostrar la tienda mas rentable\n";
+    cout << "4. Mostrar la tienda menor venta\n";
     cout << "5. Guardar datos\n";
     cout << "6. Salir\n";
     cout << "Ingrese la opcion: ";
@@ -96,11 +96,12 @@ int main() {
       break;
 
     case 6:
-      cout << "\nSaliendo del programa...\n";
+      cout << "\nSaliendo del programa\n";
       break;
 
     default:
       cout << "\nOpcion invalida.\n";
+      cout<<"Ingrese una opcion valida por favor.\n";
       pausar();
     }
 
@@ -171,7 +172,7 @@ void ver_Ventas(string *nombres, float **ventas, int numTiendas, int numDias) {
 
 void ver_Promedio(string *nombres, float **ventas, int numTiendas,
                   int numDias) {
-  cout << "\n=== PROMEDIO DE VENTAS ===\n";
+  cout << "\n=== Promedio de venta(s) ===\n";
   cout << "Tienda\t\tPromedio\n";
   cout << "---------------------------\n";
 
