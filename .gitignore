@@ -7,9 +7,3 @@ multitienda
 # IDE / Editor
 .vscode/
 .idea/
-
-# Datos locales y ejecutables de verificacion
-multitienda.dat
-multitienda.tmp
-multitienda
-__pycache__/

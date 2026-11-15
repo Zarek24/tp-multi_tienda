@@ -2,39 +2,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iomanip>
-#include <limits>
-#include <cmath>
-#include <stdexcept>
-#include <cstdio>
 
 using namespace std;
-
-// Lectura por linea: rechaza texto sobrante, negativos y valores no finitos.
-// EOF termina el programa de forma controlada.
-struct FinEntrada {};
-template<class T> void leerNumero(T& valor, T minimo, T maximo) {
-    string linea;
-    while (true) {
-        if (!getline(cin, linea)) throw FinEntrada{};
-        istringstream entrada(linea);
-        T candidato;
-        if ((entrada >> candidato) && (entrada >> ws).eof()
-            && isfinite(static_cast<double>(candidato))
-            && candidato >= minimo && candidato <= maximo) {
-            valor = candidato;
-            return;
-        }
-        cout << "[Error] Ingrese un numero entre " << minimo << " y " << maximo << ": ";
-    }
-}
-void leerTexto(string& valor) {
-    while (true) {
-        if (!getline(cin, valor)) throw FinEntrada{};
-        if (valor.find_first_not_of(" \t\r") != string::npos) return;
-        cout << "[Error] El texto no puede estar vacio: ";
-    }
-}
 
 // ==================== ESTRUCTURAS ====================
 struct Tienda {
@@ -97,7 +66,6 @@ void cargarDatos(Tienda*& tiendas, int& numTiendas, double**& matriz, int& numDi
 
 // ==================== FUNCION PRINCIPAL ====================
 int main() {
-    cout << fixed << setprecision(2);
     Tienda* tiendas = nullptr;
     int numTiendas = 0;
 
@@ -112,7 +80,6 @@ int main() {
 
     int opcion;
 
-    try {
     do {
         cout << "\n============================================\n";
         cout << "       SISTEMA MULTITIENDA - AVANZADO       \n";
@@ -129,21 +96,17 @@ int main() {
         cout << "10. Calcular ventas por tienda y promedios\n";
         cout << "11. Mostrar venta maxima y minima\n";
         cout << "12. Mostrar total general y participacion\n";
-        cout << "13. Reportes del sistema (Recaudacion y Ranking)\n";
+        cout << "13. Reportes del sistema (Rentabilidad y Rankings)\n";
         cout << "14. Guardar datos en archivos\n";
         cout << "15. Cargar datos desde archivos\n";
         cout << " 0. Salir\n";
         cout << "Seleccione una opcion: ";
-        leerNumero(opcion, 0, 15);
+        cin >> opcion;
 
         switch (opcion) {
         case 1:
-            {
-                int anteriores = numTiendas;
-                registrarTienda(tiendas, numTiendas);
-                if (matrizVentas && numTiendas != anteriores)
-                    crearMatrizVentas(matrizVentas, anteriores, numDias, numTiendas, numDias);
-            }
+            registrarTienda(tiendas, numTiendas);
+            // Si ya existe matriz, se debe recrear o ajustar tamaño de filas
             break;
         case 2:
             mostrarTiendas(tiendas, numTiendas);
@@ -158,7 +121,7 @@ int main() {
             }
             int nuevosDias;
             cout << "Ingrese el numero de dias a registrar en la matriz: ";
-            leerNumero(nuevosDias, 1, 366);
+            cin >> nuevosDias;
             if (nuevosDias <= 0) {
                 cout << "[Error] Numero de dias invalido.\n";
                 break;
@@ -230,10 +193,6 @@ int main() {
         }
     } while (opcion != 0);
 
-    } catch (const FinEntrada&) {
-        cout << "\nEntrada finalizada. Guarde desde el menu antes de salir para conservar cambios.\n";
-    }
-
     // Liberar memoria principal al salir
     delete[] tiendas;
     delete[] productos;
@@ -257,18 +216,18 @@ bool existeTienda(Tienda* tiendas, int tam, const string& codigo) {
 }
 
 void registrarTienda(Tienda*& tiendas, int& tam) {
-    if (tam >= 1000) { cout << "Limite: 1000 tiendas.\n"; return; }
     Tienda nueva;
     cout << "\n--- REGISTRAR TIENDA ---\n";
-    cout << "Codigo: "; leerTexto(nueva.codigo);
+    cout << "Codigo: "; cin >> nueva.codigo;
     if (existeTienda(tiendas, tam, nueva.codigo)) {
         cout << "[Error] El codigo ya existe.\n";
         return;
     }
-    cout << "Nombre: "; leerTexto(nueva.nombre);
-    cout << "Direccion: "; leerTexto(nueva.direccion);
-    cout << "Distrito: "; leerTexto(nueva.distrito);
-    cout << "Encargado: "; leerTexto(nueva.encargado);
+    cin.ignore();
+    cout << "Nombre: "; getline(cin, nueva.nombre);
+    cout << "Direccion: "; getline(cin, nueva.direccion);
+    cout << "Distrito: "; getline(cin, nueva.distrito);
+    cout << "Encargado: "; getline(cin, nueva.encargado);
     nueva.estado = true;
 
     Tienda* aux = new Tienda[tam + 1];
@@ -294,7 +253,7 @@ void mostrarTiendas(Tienda* tiendas, int tam) {
 void modificarTienda(Tienda* tiendas, int tam) {
     if (tam == 0) { cout << "No hay tiendas.\n"; return; }
     string cod;
-    cout << "Codigo de tienda a modificar: "; leerTexto(cod);
+    cout << "Codigo de tienda a modificar: "; cin >> cod;
     int idx = -1;
     for (int i = 0; i < tam; i++) {
         if (tiendas[i].codigo == cod) { idx = i; break; }
@@ -303,7 +262,8 @@ void modificarTienda(Tienda* tiendas, int tam) {
 
     int opc;
     cout << "1. Cambiar Encargado\n2. Cambiar Direccion/Distrito\n3. Cambiar Estado\nOpcion: ";
-    leerNumero(opc, 1, 3);
+    cin >> opc;
+    cin.ignore();
     if (opc == 1) {
         cout << "Nuevo encargado: "; getline(cin, tiendas[idx].encargado);
     }
@@ -345,15 +305,11 @@ void registrarVentas(double** matriz, Tienda* tiendas, int numTiendas, int numDi
         mostrarTiendas(tiendas, numTiendas);
         int tIndex, dIndex;
         double monto;
-        cout << "Indique el indice de la tienda (0 a " << numTiendas - 1 << "): "; leerNumero(tIndex, 0, numTiendas - 1);
-        cout << "Indique el dia (1 a " << numDias << "): "; leerNumero(dIndex, 1, numDias);
-        cout << "Monto vendido: "; leerNumero(monto, 0.0, 1e12);
+        cout << "Indique el indice de la tienda (0 a " << numTiendas - 1 << "): "; cin >> tIndex;
+        cout << "Indique el dia (1 a " << numDias << "): "; cin >> dIndex;
+        cout << "Monto vendido: "; cin >> monto;
 
         if (tIndex >= 0 && tIndex < numTiendas && dIndex >= 1 && dIndex <= numDias) {
-            if (!tiendas[tIndex].estado) {
-                cout << "[Error] La tienda esta inactiva.\n";
-                continue;
-            }
             matriz[tIndex][dIndex - 1] = monto;
             cout << "[Exito] Venta registrada.\n";
         }
@@ -361,7 +317,7 @@ void registrarVentas(double** matriz, Tienda* tiendas, int numTiendas, int numDi
             cout << "[Error] Indices fuera de rango.\n";
         }
 
-        cout << "Desea registrar otra venta? (1: Si / 0: No): "; leerNumero(opc, 0, 1);
+        cout << "Desea registrar otra venta? (1: Si / 0: No): "; cin >> opc;
     } while (opc == 1);
 }
 
@@ -386,14 +342,14 @@ bool existeProducto(Producto* productos, int tam, const string& codigo) {
 }
 
 void registrarProducto(Producto*& productos, int& tam) {
-    if (tam >= 100000) { cout << "Limite: 100000 productos.\n"; return; }
     Producto p;
     cout << "\n--- REGISTRAR PRODUCTO ---\n";
-    cout << "Codigo: "; leerTexto(p.codigo);
+    cout << "Codigo: "; cin >> p.codigo;
     if (existeProducto(productos, tam, p.codigo)) { cout << "[Error] Codigo duplicado.\n"; return; }
-    cout << "Nombre: "; leerTexto(p.nombre);
-    cout << "Precio: "; leerNumero(p.precio, 0.0, 1e12);
-    cout << "Stock: "; leerNumero(p.stock, 0, 1000000000);
+    cin.ignore();
+    cout << "Nombre: "; getline(cin, p.nombre);
+    cout << "Precio: "; cin >> p.precio;
+    cout << "Stock: "; cin >> p.stock;
 
     Producto* aux = new Producto[tam + 1];
     for (int i = 0; i < tam; i++) aux[i] = productos[i];
@@ -409,29 +365,23 @@ void mostrarProductos(Producto* productos, int tam) {
     cout << "\n--- LISTA DE PRODUCTOS ---\n";
     for (int i = 0; i < tam; i++) {
         cout << "Cod: " << productos[i].codigo << " | Nombre: " << productos[i].nombre
-            << " | Precio: S/ " << productos[i].precio << " | Stock: " << productos[i].stock << "\n";
+            << " | Precio: $" << productos[i].precio << " | Stock: " << productos[i].stock << "\n";
     }
 }
 
 // --- GESTIÓN DE EMPLEADOS ---
 void registrarEmpleado(Empleado*& empleados, int& tam, Tienda* tiendas, int numTiendas) {
     if (numTiendas == 0) { cout << "Debe registrar tiendas primero.\n"; return; }
-    if (tam >= 100000) { cout << "Limite: 100000 empleados.\n"; return; }
     Empleado e;
     cout << "\n--- REGISTRAR EMPLEADO ---\n";
-    cout << "Codigo: "; leerTexto(e.codigo);
-    for (int i = 0; i < tam; i++) if (empleados[i].codigo == e.codigo) {
-        cout << "[Error] Codigo duplicado.\n"; return;
-    }
-    cout << "Nombre: "; leerTexto(e.nombre);
-    cout << "Puesto: "; leerTexto(e.puesto);
-    cout << "Sueldo: "; leerNumero(e.sueldo, 0.0, 1e12);
+    cout << "Codigo: "; cin >> e.codigo;
+    cin.ignore();
+    cout << "Nombre: "; getline(cin, e.nombre);
+    cout << "Puesto: "; getline(cin, e.puesto);
+    cout << "Sueldo: "; cin >> e.sueldo;
     mostrarTiendas(tiendas, numTiendas);
-    cout << "Codigo de tienda asignada: "; leerTexto(e.tiendaCodigo);
+    cout << "Codigo de tienda asignada: "; cin >> e.tiendaCodigo;
 
-    if (!existeTienda(tiendas, numTiendas, e.tiendaCodigo)) {
-        cout << "[Error] La tienda asignada no existe.\n"; return;
-    }
     Empleado* aux = new Empleado[tam + 1];
     for (int i = 0; i < tam; i++) aux[i] = empleados[i];
     aux[tam] = e;
@@ -446,25 +396,25 @@ void mostrarEmpleados(Empleado* empleados, int tam) {
     cout << "\n--- LISTA DE EMPLEADOS ---\n";
     for (int i = 0; i < tam; i++) {
         cout << "Cod: " << empleados[i].codigo << " | Nombre: " << empleados[i].nombre
-            << " | Puesto: " << empleados[i].puesto << " | Sueldo: S/ " << empleados[i].sueldo
+            << " | Puesto: " << empleados[i].puesto << " | Sueldo: $" << empleados[i].sueldo
             << " | Tienda: " << empleados[i].tiendaCodigo << "\n";
     }
 }
 
 // --- CÁLCULOS DEL SISTEMA ---
 void calcularVentasPorTienda(double** matriz, Tienda* tiendas, int numTiendas, int numDias) {
-    cout << "\n--- VENTAS TOTALES Y PROMEDIOS POR TIENDA ---\n";
+    cout << "\n--- VENTAS TOTALES POR TIENDA ---\n";
     for (int i = 0; i < numTiendas; i++) {
         double suma = 0;
         for (int j = 0; j < numDias; j++) suma += matriz[i][j];
-        cout << tiendas[i].nombre << " (" << tiendas[i].codigo << "): S/ " << suma << " | Promedio diario: S/ " << suma / numDias << "\n";
+        cout << tiendas[i].nombre << " (" << tiendas[i].codigo << "): $" << suma << "\n";
     }
 }
 
 void calcularPromedios(double** matriz, int numTiendas, int numDias) {
     cout << "\n--- PROMEDIOS DE VENTAS ---\n";
     double totalGlobal = 0;
-
+    int totalCeldas = numTiendas * numDias;
 
     for (int i = 0; i < numTiendas; i++) {
         for (int j = 0; j < numDias; j++) {
@@ -475,8 +425,8 @@ void calcularPromedios(double** matriz, int numTiendas, int numDias) {
     // Calcular el promedio diario considerando el total de días entre todas las tiendas o por día general
     double promedioDiario = (numDias > 0) ? (totalGlobal / numDias) : 0;
 
-    cout << "Promedio Diario General: S/ " << promedioDiario << "\n";
-    cout << "Total del periodo: S/ " << totalGlobal << "\n";
+    cout << "Promedio Diario General: $" << promedioDiario << "\n";
+    cout << "Promedio Mensual (Total Global): $" << totalGlobal << "\n";
 }
 
 void ventaMaximaMinima(double** matriz, Tienda* tiendas, int numTiendas, int numDias) {
@@ -490,8 +440,8 @@ void ventaMaximaMinima(double** matriz, Tienda* tiendas, int numTiendas, int num
         }
     }
     cout << "\n--- VENTA MAXIMA Y MINIMA ---\n";
-    cout << "Venta Maxima: S/ " << maxV << " en la tienda " << tiendas[tMax].nombre << " el Dia " << (dMax + 1) << "\n";
-    cout << "Venta Minima: S/ " << minV << " en la tienda " << tiendas[tMin].nombre << " el Dia " << (dMin + 1) << "\n";
+    cout << "Venta Maxima: $" << maxV << " en la tienda " << tiendas[tMax].nombre << " el Dia " << (dMax + 1) << "\n";
+    cout << "Venta Minima: $" << minV << " en la tienda " << tiendas[tMin].nombre << " el Dia " << (dMin + 1) << "\n";
 }
 
 void totalGeneralYParticipacion(double** matriz, Tienda* tiendas, int numTiendas, int numDias) {
@@ -507,7 +457,7 @@ void totalGeneralYParticipacion(double** matriz, Tienda* tiendas, int numTiendas
     }
 
     cout << "\n--- TOTAL GENERAL Y PARTICIPACION ---\n";
-    cout << "Total General Vendido: S/ " << totalGen << "\n";
+    cout << "Total General Vendido: $" << totalGen << "\n";
     for (int i = 0; i < numTiendas; i++) {
         double porcentaje = (totalGen > 0) ? (totalesTienda[i] * 100.0 / totalGen) : 0;
         cout << tiendas[i].nombre << ": " << porcentaje << "% de participacion\n";
@@ -531,8 +481,8 @@ void reportesSistema(double** matriz, Tienda* tiendas, int numTiendas, int numDi
         if (totales[i] < totales[idxMin]) idxMin = i;
     }
 
-    cout << "Tienda con Mayor Recaudacion: " << tiendas[idxMax].nombre << " con S/ " << totales[idxMax] << "\n";
-    cout << "Tienda con Menor Recaudacion: " << tiendas[idxMin].nombre << " con S/ " << totales[idxMin] << "\n";
+    cout << "Tienda Mas Rentable: " << tiendas[idxMax].nombre << " with $" << totales[idxMax] << "\n";
+    cout << "Tienda Menos Rentable: " << tiendas[idxMin].nombre << " with $" << totales[idxMin] << "\n";
 
     // Ranking simple (Burbuja)
     int* indices = new int[numTiendas];
@@ -549,102 +499,91 @@ void reportesSistema(double** matriz, Tienda* tiendas, int numTiendas, int numDi
 
     cout << "\nRanking de Tiendas (Mayor a Menor Venta):\n";
     for (int i = 0; i < numTiendas; i++) {
-        cout << i + 1 << ". " << tiendas[indices[i]].nombre << " - S/ " << totales[indices[i]] << "\n";
+        cout << i + 1 << ". " << tiendas[indices[i]].nombre << " - $" << totales[indices[i]] << "\n";
     }
 
     delete[] totales;
     delete[] indices;
 }
 
-// --- GESTION DE ARCHIVOS ---
-// Un solo archivo versionado evita mezclar tiendas y ventas de sesiones diferentes.
+// --- GESTIÓN DE ARCHIVOS ---
 void guardarDatos(Tienda* tiendas, int numTiendas, double** matriz, int numDias, Producto* productos, int numProductos, Empleado* empleados, int numEmpleados) {
-    ofstream f("multitienda.tmp");
-    f << setprecision(numeric_limits<double>::max_digits10);
-    f << "MULTITIENDA_V1\n" << numTiendas << " " << numDias << " " << numProductos << " " << numEmpleados << "\n";
+    // 1. Guardar Tiendas
+    ofstream fTiendas("tiendas.txt");
     for (int i = 0; i < numTiendas; i++) {
-        const Tienda& t = tiendas[i];
-        f << quoted(t.codigo) << " " << quoted(t.nombre) << " " << quoted(t.direccion) << " "
-          << quoted(t.distrito) << " " << quoted(t.encargado) << " " << t.estado << "\n";
+        fTiendas << tiendas[i].codigo << "|" << tiendas[i].nombre << "|"
+            << tiendas[i].direccion << "|" << tiendas[i].distrito << "|"
+            << tiendas[i].encargado << "|" << tiendas[i].estado << "\n";
     }
-    for (int i = 0; i < numTiendas; i++) {
-        for (int j = 0; j < numDias; j++) f << matriz[i][j] << " ";
-        f << "\n";
+    fTiendas.close();
+
+    // 2. Guardar Ventas
+    ofstream fVentas("ventas.txt");
+    fVentas << numTiendas << " " << numDias << "\n";
+    if (matriz != nullptr) {
+        for (int i = 0; i < numTiendas; i++) {
+            for (int j = 0; j < numDias; j++) {
+                fVentas << matriz[i][j] << (j == numDias - 1 ? "" : " ");
+            }
+            fVentas << "\n";
+        }
     }
+    fVentas.close();
+
+    // 3. Guardar Productos
+    ofstream fProd("productos.txt");
     for (int i = 0; i < numProductos; i++) {
-        const Producto& p = productos[i];
-        f << quoted(p.codigo) << " " << quoted(p.nombre) << " " << p.precio << " " << p.stock << "\n";
+        fProd << productos[i].codigo << "|" << productos[i].nombre << "|"
+            << productos[i].precio << "|" << productos[i].stock << "\n";
     }
-    for (int i = 0; i < numEmpleados; i++) {
-        const Empleado& e = empleados[i];
-        f << quoted(e.codigo) << " " << quoted(e.nombre) << " " << quoted(e.puesto) << " "
-          << e.sueldo << " " << quoted(e.tiendaCodigo) << "\n";
-    }
-    f.close();
-    if (!f || rename("multitienda.tmp", "multitienda.dat") != 0) {
-        cout << "[Error] No se pudo guardar. Se conserva el archivo anterior.\n";
-        remove("multitienda.tmp");
-        return;
-    }
-    cout << "[Exito] Datos guardados en multitienda.dat.\n";
+    fProd.close();
+
+    cout << "[Exito] Datos guardados correctamente en archivos de texto.\n";
 }
 
 void cargarDatos(Tienda*& tiendas, int& numTiendas, double**& matriz, int& numDias, Producto*& productos, int& numProductos, Empleado*& empleados, int& numEmpleados) {
-    ifstream f("multitienda.dat");
-    if (!f) { cout << "[Error] No se pudo abrir multitienda.dat.\n"; return; }
-    Tienda* ts = nullptr;
-    Producto* ps = nullptr;
-    Empleado* es = nullptr;
-    double** vs = nullptr;
-    int nt = 0, nd = 0, np = 0, ne = 0;
-    auto liberar = [&]() {
-        if (vs) { for (int i = 0; i < nt; i++) delete[] vs[i]; delete[] vs; }
-        delete[] ts; delete[] ps; delete[] es;
-    };
-    auto textoValido = [](const string& t) { return t.find_first_not_of(" \t\r\n") != string::npos; };
-    auto montoValido = [](double v) { return isfinite(v) && v >= 0 && v <= 1e12; };
-    try {
-        string version;
-        if (!(f >> version >> nt >> nd >> np >> ne) || version != "MULTITIENDA_V1"
-            || nt < 0 || nt > 1000 || nd < 0 || nd > 366 || (nt == 0 && nd != 0)
-            || np < 0 || np > 100000 || ne < 0 || ne > 100000) throw runtime_error("cabecera invalida");
-        ts = new Tienda[nt]; ps = new Producto[np]; es = new Empleado[ne];
-        vs = new double*[nt]();
-        for (int i = 0; i < nt; i++) {
-            Tienda& t = ts[i]; int estado;
-            if (!(f >> quoted(t.codigo) >> quoted(t.nombre) >> quoted(t.direccion) >> quoted(t.distrito)
-                  >> quoted(t.encargado) >> estado) || (estado != 0 && estado != 1)
-                || !textoValido(t.codigo) || !textoValido(t.nombre) || !textoValido(t.direccion)
-                || !textoValido(t.distrito) || !textoValido(t.encargado) || existeTienda(ts, i, t.codigo))
-                throw runtime_error("tienda invalida o duplicada");
-            t.estado = estado == 1;
-            vs[i] = new double[nd]();
+    // Cargar Tiendas
+    ifstream fTiendas("tiendas.txt");
+    if (fTiendas.is_open()) {
+        string linea;
+        delete[] tiendas;
+        tiendas = nullptr;
+        numTiendas = 0;
+        while (getline(fTiendas, linea)) {
+            stringstream ss(linea);
+            string cod, nom, dir, dist, enc, estStr;
+            getline(ss, cod, '|');
+            getline(ss, nom, '|');
+            getline(ss, dir, '|');
+            getline(ss, dist, '|');
+            getline(ss, enc, '|');
+            getline(ss, estStr);
+
+            Tienda t = { cod, nom, dir, dist, enc, (estStr == "1") };
+            Tienda* aux = new Tienda[numTiendas + 1];
+            for (int i = 0; i < numTiendas; i++) aux[i] = tiendas[i];
+            aux[numTiendas] = t;
+            delete[] tiendas;
+            tiendas = aux;
+            numTiendas++;
         }
-        for (int i = 0; i < nt; i++) for (int j = 0; j < nd; j++)
-            if (!(f >> vs[i][j]) || !montoValido(vs[i][j])) throw runtime_error("venta invalida");
-        for (int i = 0; i < np; i++) {
-            Producto& p = ps[i];
-            if (!(f >> quoted(p.codigo) >> quoted(p.nombre) >> p.precio >> p.stock)
-                || !textoValido(p.codigo) || !textoValido(p.nombre) || !montoValido(p.precio)
-                || p.stock < 0 || p.stock > 1000000000 || existeProducto(ps, i, p.codigo))
-                throw runtime_error("producto invalido o duplicado");
-        }
-        for (int i = 0; i < ne; i++) {
-            Empleado& e = es[i];
-            if (!(f >> quoted(e.codigo) >> quoted(e.nombre) >> quoted(e.puesto) >> e.sueldo >> quoted(e.tiendaCodigo))
-                || !textoValido(e.codigo) || !textoValido(e.nombre) || !textoValido(e.puesto)
-                || !montoValido(e.sueldo) || !existeTienda(ts, nt, e.tiendaCodigo)) throw runtime_error("empleado invalido");
-            for (int j = 0; j < i; j++) if (es[j].codigo == e.codigo) throw runtime_error("empleado duplicado");
-        }
-        if (!(f >> ws).eof()) throw runtime_error("contenido sobrante");
-    } catch (const exception& error) {
-        liberar();
-        cout << "[Error] Carga cancelada: " << error.what() << ". Se mantienen los datos actuales.\n";
-        return;
+        fTiendas.close();
     }
-    if (matriz) { for (int i = 0; i < numTiendas; i++) delete[] matriz[i]; delete[] matriz; }
-    delete[] tiendas; delete[] productos; delete[] empleados;
-    tiendas = ts; productos = ps; empleados = es; matriz = vs;
-    numTiendas = nt; numDias = nd; numProductos = np; numEmpleados = ne;
-    cout << "[Exito] Datos cargados desde multitienda.dat (reemplazan la sesion actual).\n";
+
+    // Cargar Ventas
+    ifstream fVentas("ventas.txt");
+    if (fVentas.is_open()) {
+        int nT, nD;
+        fVentas >> nT >> nD;
+        crearMatrizVentas(matriz, numTiendas, numDias, nT, nD);
+        numDias = nD;
+        for (int i = 0; i < nT; i++) {
+            for (int j = 0; j < nD; j++) {
+                fVentas >> matriz[i][j];
+            }
+        }
+        fVentas.close();
+    }
+
+    cout << "[Exito] Datos cargados exitosamente desde los archivos.\n";
 }
