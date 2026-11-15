@@ -104,10 +104,15 @@ int main() {
         cin >> opcion;
 
         switch (opcion) {
-        case 1:
+        case 1: {
+            int tiendasAntes = numTiendas;
             registrarTienda(tiendas, numTiendas);
-            // Si ya existe matriz, se debe recrear o ajustar tamaño de filas
+            // Mantener una fila de ventas por cada tienda registrada.
+            if (numTiendas > tiendasAntes && matrizVentas != nullptr) {
+                crearMatrizVentas(matrizVentas, tiendasAntes, numDias, numTiendas, numDias);
+            }
             break;
+        }
         case 2:
             mostrarTiendas(tiendas, numTiendas);
             break;
