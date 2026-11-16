@@ -69,6 +69,13 @@ void reportesSistema(double** matriz, Tienda* tiendas, int numTiendas, int numDi
 void guardarDatos(Tienda* tiendas, int numTiendas, double** matriz, int numDias, Producto* productos, int numProductos, Empleado* empleados, int numEmpleados);
 void cargarDatos(Tienda*& tiendas, int& numTiendas, double**& matriz, int& numDias, Producto*& productos, int& numProductos, Empleado*& empleados, int& numEmpleados);
 
+// Submenus
+void menuTiendas(Tienda*& tiendas, int& numTiendas, double**& matrizVentas, int numDias);
+void menuVentas(Tienda* tiendas, int numTiendas, double**& matrizVentas, int& numDias);
+void menuReportes(Tienda* tiendas, int numTiendas, double** matrizVentas, int numDias);
+void menuProductos(Producto*& productos, int& numProductos);
+void menuEmpleados(Empleado*& empleados, int& numEmpleados, Tienda* tiendas, int numTiendas);
+
 // ==================== FUNCION PRINCIPAL ====================
 int main() {
     cout.setf(ios::fixed);
@@ -89,119 +96,42 @@ int main() {
 
     do {
         cout << "\n============================================\n";
-        cout << "       SISTEMA MULTITIENDA - AVANZADO       \n";
+        cout << "           SISTEMA MULTITIENDA\n";
         cout << "============================================\n";
-        cout << " 1. Registrar tienda\n";
-        cout << " 2. Mostrar tiendas\n";
-        cout << " 3. Modificar tienda\n";
-        cout << " 4. Crear/Redimensionar Matriz de Ventas y Registrar\n";
-        cout << " 5. Mostrar matriz de ventas\n";
-        cout << " 6. Registrar producto\n";
-        cout << " 7. Mostrar productos\n";
-        cout << " 8. Registrar empleado\n";
-        cout << " 9. Mostrar empleados\n";
-        cout << "10. Calcular ventas por tienda y promedios\n";
-        cout << "11. Mostrar venta maxima y minima\n";
-        cout << "12. Mostrar total general y participacion\n";
-        cout << "13. Reportes del sistema (Ventas y Ranking)\n";
-        cout << "14. Guardar datos en archivos\n";
-        cout << "15. Cargar datos desde archivos\n";
-        cout << " 0. Salir\n";
-        cout << "Seleccione una opcion: ";
-        if (leerEntero("", opcion, 0, 15) == false) break;
-
+        cout << "1. Gestionar tiendas\n";
+        cout << "2. Gestionar ventas\n";
+        cout << "3. Consultar reportes\n";
+        cout << "4. Gestionar productos\n";
+        cout << "5. Gestionar empleados\n";
+        cout << "6. Guardar datos\n";
+        cout << "7. Cargar datos\n";
+        cout << "0. Salir\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 7) == false) break;
         switch (opcion) {
-        case 1: {
-            int tiendasAntes = numTiendas;
-            registrarTienda(tiendas, numTiendas);
-            // Mantener una fila de ventas por cada tienda registrada.
-            if (numTiendas > tiendasAntes && matrizVentas != nullptr) {
-                crearMatrizVentas(matrizVentas, tiendasAntes, numDias, numTiendas, numDias);
-            }
+        case 1:
+            menuTiendas(tiendas, numTiendas, matrizVentas, numDias);
             break;
-        }
         case 2:
-            mostrarTiendas(tiendas, numTiendas);
+            menuVentas(tiendas, numTiendas, matrizVentas, numDias);
             break;
         case 3:
-            modificarTienda(tiendas, numTiendas);
+            menuReportes(tiendas, numTiendas, matrizVentas, numDias);
             break;
-        case 4: {
-            if (numTiendas == 0) {
-                cout << "[Error] Primero debe registrar al menos una tienda.\n";
-                break;
-            }
-            int nuevosDias;
-            cout << "Ingrese el numero de dias a registrar en la matriz: ";
-            if (leerEntero("", nuevosDias, 1, 366) == false) break;
-            if (nuevosDias <= 0) {
-                cout << "[Error] Numero de dias invalido.\n";
-                break;
-            }
-            crearMatrizVentas(matrizVentas, numTiendas, numDias, numTiendas, nuevosDias);
-            numDias = nuevosDias;
-            registrarVentas(matrizVentas, tiendas, numTiendas, numDias);
+        case 4:
+            menuProductos(productos, numProductos);
             break;
-        }
         case 5:
-            mostrarMatrizVentas(matrizVentas, tiendas, numTiendas, numDias);
+            menuEmpleados(empleados, numEmpleados, tiendas, numTiendas);
             break;
         case 6:
-            registrarProducto(productos, numProductos);
-            break;
-        case 7:
-            mostrarProductos(productos, numProductos);
-            break;
-        case 8:
-            registrarEmpleado(empleados, numEmpleados, tiendas, numTiendas);
-            break;
-        case 9:
-            mostrarEmpleados(empleados, numEmpleados);
-            break;
-        case 10:
-            if (matrizVentas == nullptr || numDias == 0) {
-                cout << "[Aviso] Primero debe inicializar la matriz de ventas y registrar datos.\n";
-            }
-            else {
-                calcularVentasPorTienda(matrizVentas, tiendas, numTiendas, numDias);
-                calcularPromedios(matrizVentas, numTiendas, numDias);
-            }
-            break;
-        case 11:
-            if (matrizVentas == nullptr || numDias == 0) {
-                cout << "[Aviso] Matriz de ventas vacia.\n";
-            }
-            else {
-                ventaMaximaMinima(matrizVentas, tiendas, numTiendas, numDias);
-            }
-            break;
-        case 12:
-            if (matrizVentas == nullptr || numDias == 0) {
-                cout << "[Aviso] Matriz de ventas vacia.\n";
-            }
-            else {
-                totalGeneralYParticipacion(matrizVentas, tiendas, numTiendas, numDias);
-            }
-            break;
-        case 13:
-            if (matrizVentas == nullptr || numDias == 0) {
-                cout << "[Aviso] Matriz de ventas vacia.\n";
-            }
-            else {
-                reportesSistema(matrizVentas, tiendas, numTiendas, numDias);
-            }
-            break;
-        case 14:
             guardarDatos(tiendas, numTiendas, matrizVentas, numDias, productos, numProductos, empleados, numEmpleados);
             break;
-        case 15:
+        case 7:
             cargarDatos(tiendas, numTiendas, matrizVentas, numDias, productos, numProductos, empleados, numEmpleados);
             break;
         case 0:
             cout << "Saliendo del sistema...\n";
             break;
-        default:
-            cout << "[Error] Opcion invalida. Intente nuevamente.\n";
         }
     } while (opcion != 0 && cin.eof() == false);
 
@@ -220,6 +150,125 @@ int main() {
 }
 
 // ==================== DESARROLLO DE MÓDULOS ====================
+
+// Cada submenu repite sus opciones hasta elegir 0 para volver.
+void menuTiendas(Tienda*& tiendas, int& numTiendas, double**& matrizVentas, int numDias) {
+    int opcion;
+    do {
+        cout << "\n--- GESTION DE TIENDAS ---\n";
+        cout << "1. Registrar tienda\n2. Mostrar tiendas\n3. Modificar tienda\n0. Volver\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 3) == false) return;
+        switch (opcion) {
+        case 1: {
+            int tiendasAntes = numTiendas;
+            registrarTienda(tiendas, numTiendas);
+            // Si existe una matriz, agregar la fila de la tienda nueva.
+            if (numTiendas > tiendasAntes && matrizVentas != nullptr) {
+                crearMatrizVentas(matrizVentas, tiendasAntes, numDias, numTiendas, numDias);
+            }
+            break;
+        }
+        case 2:
+            mostrarTiendas(tiendas, numTiendas);
+            break;
+        case 3:
+            modificarTienda(tiendas, numTiendas);
+            break;
+        }
+    } while (opcion != 0 && cin.eof() == false);
+}
+
+void menuVentas(Tienda* tiendas, int numTiendas, double**& matrizVentas, int& numDias) {
+    int opcion;
+    do {
+        cout << "\n--- GESTION DE VENTAS ---\n";
+        cout << "1. Configurar dias y registrar ventas\n2. Consultar ventas por tienda y dia\n0. Volver\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 2) == false) return;
+        switch (opcion) {
+        case 1: {
+            if (numTiendas == 0) {
+                cout << "[Error] Primero debe registrar al menos una tienda.\n";
+                break;
+            }
+            int nuevosDias;
+            if (leerEntero("Numero de dias a evaluar: ", nuevosDias, 1, 366) == false) return;
+            crearMatrizVentas(matrizVentas, numTiendas, numDias, numTiendas, nuevosDias);
+            numDias = nuevosDias;
+            registrarVentas(matrizVentas, tiendas, numTiendas, numDias);
+            break;
+        }
+        case 2:
+            mostrarMatrizVentas(matrizVentas, tiendas, numTiendas, numDias);
+            break;
+        }
+    } while (opcion != 0 && cin.eof() == false);
+}
+
+void menuReportes(Tienda* tiendas, int numTiendas, double** matrizVentas, int numDias) {
+    int opcion;
+    do {
+        cout << "\n--- REPORTES ---\n";
+        cout << "1. Ventas por tienda y promedios\n";
+        cout << "2. Venta maxima y minima\n";
+        cout << "3. Total general y participacion\n";
+        cout << "4. Mayor y menor venta y ranking\n0. Volver\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 4) == false) return;
+        if (opcion != 0 && (matrizVentas == nullptr || numDias == 0)) {
+            cout << "[Aviso] Primero debe registrar ventas.\n";
+        } else {
+            switch (opcion) {
+            case 1:
+                calcularVentasPorTienda(matrizVentas, tiendas, numTiendas, numDias);
+                calcularPromedios(matrizVentas, numTiendas, numDias);
+                break;
+            case 2:
+                ventaMaximaMinima(matrizVentas, tiendas, numTiendas, numDias);
+                break;
+            case 3:
+                totalGeneralYParticipacion(matrizVentas, tiendas, numTiendas, numDias);
+                break;
+            case 4:
+                reportesSistema(matrizVentas, tiendas, numTiendas, numDias);
+                break;
+            }
+        }
+    } while (opcion != 0 && cin.eof() == false);
+}
+
+void menuProductos(Producto*& productos, int& numProductos) {
+    int opcion;
+    do {
+        cout << "\n--- GESTION DE PRODUCTOS ---\n";
+        cout << "1. Registrar producto\n2. Mostrar productos\n0. Volver\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 2) == false) return;
+        switch (opcion) {
+        case 1:
+            registrarProducto(productos, numProductos);
+            break;
+        case 2:
+            mostrarProductos(productos, numProductos);
+            break;
+        }
+    } while (opcion != 0 && cin.eof() == false);
+}
+
+void menuEmpleados(Empleado*& empleados, int& numEmpleados, Tienda* tiendas, int numTiendas) {
+    int opcion;
+    do {
+        cout << "\n--- GESTION DE EMPLEADOS ---\n";
+        cout << "1. Registrar empleado\n2. Mostrar empleados\n0. Volver\n";
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 2) == false) return;
+        switch (opcion) {
+        case 1:
+            registrarEmpleado(empleados, numEmpleados, tiendas, numTiendas);
+            break;
+        case 2:
+            mostrarEmpleados(empleados, numEmpleados);
+            break;
+        }
+    } while (opcion != 0 && cin.eof() == false);
+}
+
 
 // Funciones de lectura y validacion.
 // Se usan recorridos para revisar los caracteres de cada texto.
