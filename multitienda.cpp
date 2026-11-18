@@ -11,7 +11,7 @@ struct Tienda {
     string direccion;
     string distrito;
     string encargado;
-    bool estado; // true = Activa, false = Inactiva
+    bool estado; // true = Activa, false = Suspendida
 };
 
 struct Producto {
@@ -394,7 +394,7 @@ void mostrarTiendas(Tienda* tiendas, int tam) {
     if (tam == 0) { cout << "No hay tiendas registradas.\n"; return; }
     cout << "\n--- LISTA DE TIENDAS ---\n";
     for (int i = 0; i < tam; i++) {
-        string estado = "Inactiva";
+        string estado = "Suspendida";
         if (tiendas[i].estado) {
             estado = "Activa";
         }
@@ -415,16 +415,42 @@ void modificarTienda(Tienda* tiendas, int tam) {
     }
     if (idx == -1) { cout << "[Error] Tienda no encontrada.\n"; return; }
     int opc;
-    cout << "1. Cambiar Encargado\n2. Cambiar Direccion/Distrito\n3. Cambiar Estado\n";
-    if (leerEntero("Opcion: ", opc, 1, 3) == false) return;
-    Tienda modificada = tiendas[idx];
-    if (opc == 1) {
-        if (leerTexto("Nuevo encargado: ", modificada.encargado) == false) return;
-    } else if (opc == 2) {
-        if (leerTexto("Nueva direccion: ", modificada.direccion) == false) return;
-        if (leerTexto("Nuevo distrito: ", modificada.distrito) == false) return;
+    cout << "\n--- MODIFICAR TIENDA ---\n";
+    cout << "Tienda: " << tiendas[idx].nombre << "\n";
+    cout << "1. Cambiar nombre de la tienda\n";
+    cout << "2. Cambiar encargado\n";
+    cout << "3. Cambiar direccion\n";
+    cout << "4. Cambiar distrito\n";
+    if (tiendas[idx].estado) {
+        cout << "5. Suspender tienda\n";
     } else {
-        modificada.estado = !modificada.estado;
+        cout << "5. Reactivar tienda\n";
+    }
+    cout << "0. Volver\n";
+    if (leerEntero("Opcion: ", opc, 0, 5) == false) return;
+    Tienda modificada = tiendas[idx];
+    switch (opc) {
+    case 1:
+        if (leerTexto("Nueva tienda: ", modificada.nombre) == false) return;
+        break;
+    case 2:
+        if (leerTexto("Nuevo encargado: ", modificada.encargado) == false) return;
+        break;
+    case 3:
+        if (leerTexto("Nueva direccion: ", modificada.direccion) == false) return;
+        break;
+    case 4:
+        if (leerTexto("Nuevo distrito: ", modificada.distrito) == false) return;
+        break;
+    case 5:
+        if (modificada.estado) {
+            modificada.estado = false;
+        } else {
+            modificada.estado = true;
+        }
+        break;
+    case 0:
+        return;
     }
     tiendas[idx] = modificada;
     cout << "[Exito] Tienda actualizada.\n";
@@ -468,7 +494,7 @@ void registrarVentas(double** matriz, Tienda* tiendas, int numTiendas, int numDi
         if (indice == -1) {
             cout << "[Error] Tienda no encontrada.\n";
         } else if (!tiendas[indice].estado) {
-            cout << "[Error] La tienda esta inactiva.\n";
+            cout << "[Error] La tienda esta suspendida.\n";
         } else {
             int dia;
             double monto;
