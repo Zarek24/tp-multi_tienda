@@ -376,7 +376,7 @@ void registrarTienda(Tienda*& tiendas, int& tam) {
         cout << "[Error] El codigo ya existe.\n";
         return;
     }
-    if (leerTexto("Nombre: ", nueva.nombre) == false) return;
+    if (leerTexto("Tienda: ", nueva.nombre) == false) return;
     if (leerTexto("Direccion: ", nueva.direccion) == false) return;
     if (leerTexto("Distrito: ", nueva.distrito) == false) return;
     if (leerTexto("Encargado: ", nueva.encargado) == false) return;
@@ -398,7 +398,7 @@ void mostrarTiendas(Tienda* tiendas, int tam) {
         if (tiendas[i].estado) {
             estado = "Activa";
         }
-        cout << "Codigo: " << tiendas[i].codigo << " | Nombre: " << tiendas[i].nombre
+        cout << "Codigo: " << tiendas[i].codigo << " | Tienda: " << tiendas[i].nombre
             << " | Direccion: " << tiendas[i].direccion << " (" << tiendas[i].distrito
             << ") | Encargado: " << tiendas[i].encargado
             << " | Estado: " << estado << "\n";
