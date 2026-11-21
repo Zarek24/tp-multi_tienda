@@ -286,8 +286,8 @@ bool textoValido(string texto) {
     bool tieneContenido = false;
     int cantidad = texto.length();
     for (int i = 0; i < cantidad; i++) {
-        // La barra separa campos en los archivos; no puede ser parte de un dato.
-        if (texto[i] == '|' || texto[i] == '\n') {
+        // El punto y coma separa campos en los archivos; no puede ser parte de un dato.
+        if (texto[i] == ';' || texto[i] == '\n') {
             return false;
         }
         if (texto[i] != ' ' && texto[i] != '\t' && texto[i] != '\r') {
@@ -305,7 +305,7 @@ bool leerTexto(string mensaje, string& valor) {
         if (cin.eof()) return false;
         valido = textoValido(valor);
         if (valido == false) {
-            cout << "[Error] Ingrese texto no vacio y sin el caracter |.\n";
+            cout << "[Error] Ingrese texto no vacio y sin el caracter ;.\n";
         }
     } while (valido == false);
     return true;
@@ -714,8 +714,8 @@ void guardarDatos(Tienda* tiendas, int numTiendas, double** matriz, int numDias,
         return;
     }
     ft.close(); fv.close(); fp.close(); fe.close();
-    ft.open("tiendas.txt", ios::trunc); fv.open("ventas.txt", ios::trunc);
-    fp.open("productos.txt", ios::trunc); fe.open("empleados.txt", ios::trunc);
+    ft.open("tiendas.txt", ios::out); fv.open("ventas.txt", ios::out);
+    fp.open("productos.txt", ios::out); fe.open("empleados.txt", ios::out);
     if (!ft || !fv || !fp || !fe) {
         cout << "[Error] No se pudieron preparar los archivos para guardar.\n";
         return;
@@ -724,9 +724,9 @@ void guardarDatos(Tienda* tiendas, int numTiendas, double** matriz, int numDias,
     fp.precision(17);
     fe.precision(17);
     for (int i = 0; i < numTiendas; i++) {
-        ft << tiendas[i].codigo << "|" << tiendas[i].nombre << "|"
-           << tiendas[i].direccion << "|" << tiendas[i].distrito << "|"
-           << tiendas[i].encargado << "|" << tiendas[i].estado << "\n";
+        ft << tiendas[i].codigo << ";" << tiendas[i].nombre << ";"
+           << tiendas[i].direccion << ";" << tiendas[i].distrito << ";"
+           << tiendas[i].encargado << ";" << tiendas[i].estado << "\n";
     }
     fv << numTiendas << " " << numDias << "\n";
     for (int i = 0; i < numTiendas; i++) {
@@ -734,12 +734,12 @@ void guardarDatos(Tienda* tiendas, int numTiendas, double** matriz, int numDias,
         fv << "\n";
     }
     for (int i = 0; i < numProductos; i++) {
-        fp << productos[i].codigo << "|" << productos[i].nombre << "|"
-           << productos[i].precio << "|" << productos[i].stock << "\n";
+        fp << productos[i].codigo << ";" << productos[i].nombre << ";"
+           << productos[i].precio << ";" << productos[i].stock << "\n";
     }
     for (int i = 0; i < numEmpleados; i++) {
-        fe << empleados[i].codigo << "|" << empleados[i].nombre << "|"
-           << empleados[i].puesto << "|" << empleados[i].sueldo << "|"
+        fe << empleados[i].codigo << ";" << empleados[i].nombre << ";"
+           << empleados[i].puesto << ";" << empleados[i].sueldo << ";"
            << empleados[i].tiendaCodigo << "\n";
     }
     ft.close(); fv.close(); fp.close(); fe.close();
@@ -775,12 +775,12 @@ int contarRegistros(ifstream& archivo, int maximo) {
 
 bool cargarTienda(ifstream& archivo, Tienda& tienda) {
     int estado = 0;
-    // Cada getline lee hasta la barra que separa los campos.
-    getline(archivo, tienda.codigo, '|');
-    getline(archivo, tienda.nombre, '|');
-    getline(archivo, tienda.direccion, '|');
-    getline(archivo, tienda.distrito, '|');
-    getline(archivo, tienda.encargado, '|');
+    // Cada getline lee hasta el punto y coma que separa los campos.
+    getline(archivo, tienda.codigo, ';');
+    getline(archivo, tienda.nombre, ';');
+    getline(archivo, tienda.direccion, ';');
+    getline(archivo, tienda.distrito, ';');
+    getline(archivo, tienda.encargado, ';');
     archivo >> estado;
     if (archivo.fail()) return false;
     if (terminarLinea(archivo) == false) return false;
@@ -800,13 +800,13 @@ bool cargarTienda(ifstream& archivo, Tienda& tienda) {
 
 bool cargarProducto(ifstream& archivo, Producto& producto) {
     char separador = ' ';
-    getline(archivo, producto.codigo, '|');
-    getline(archivo, producto.nombre, '|');
+    getline(archivo, producto.codigo, ';');
+    getline(archivo, producto.nombre, ';');
     archivo >> producto.precio;
     archivo >> separador;
     archivo >> producto.stock;
     if (archivo.fail()) return false;
-    if (separador != '|') return false;
+    if (separador != ';') return false;
     if (terminarLinea(archivo) == false) return false;
     if (textoValido(producto.codigo) == false) return false;
     if (textoValido(producto.nombre) == false) return false;
@@ -817,14 +817,14 @@ bool cargarProducto(ifstream& archivo, Producto& producto) {
 
 bool cargarEmpleado(ifstream& archivo, Empleado& empleado) {
     char separador = ' ';
-    getline(archivo, empleado.codigo, '|');
-    getline(archivo, empleado.nombre, '|');
-    getline(archivo, empleado.puesto, '|');
+    getline(archivo, empleado.codigo, ';');
+    getline(archivo, empleado.nombre, ';');
+    getline(archivo, empleado.puesto, ';');
     archivo >> empleado.sueldo;
     archivo >> separador;
     getline(archivo, empleado.tiendaCodigo);
     if (archivo.fail()) return false;
-    if (separador != '|') return false;
+    if (separador != ';') return false;
     if (textoValido(empleado.codigo) == false) return false;
     if (textoValido(empleado.nombre) == false) return false;
     if (textoValido(empleado.puesto) == false) return false;
