@@ -35,3 +35,9 @@ En Windows, ejecuta `multitienda.exe` después de compilar.
 - `multitienda.cpp`: código fuente.
 - `README.md`: documentación del proyecto.
 - Los cuatro archivos `.txt` se generan durante la ejecución.
+
+## Versiones del Hito 1
+- `revision/hito-1`: versión anterior, con menú principal por categorías.
+- `hito1-v2.0`: versión con diez opciones directas en el menú principal (más la opción 0 para salir). Los submenús de reportes, productos y empleados se conservan.
+
+Para comparar versiones en GitHub: https://github.com/Zarek24/tp-multi_tienda/compare/revision/hito-1...hito1-v2.0
