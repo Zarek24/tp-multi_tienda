@@ -98,35 +98,61 @@ int main() {
         cout << "\n============================================\n";
         cout << "           SISTEMA MULTITIENDA\n";
         cout << "============================================\n";
-        cout << "1. Gestionar tiendas\n";
-        cout << "2. Gestionar ventas\n";
-        cout << "3. Consultar reportes\n";
-        cout << "4. Gestionar productos\n";
-        cout << "5. Gestionar empleados\n";
-        cout << "6. Guardar datos\n";
-        cout << "7. Cargar datos\n";
+        cout << "1. Registrar tienda\n";
+        cout << "2. Mostrar tiendas\n";
+        cout << "3. Modificar tienda\n";
+        cout << "4. Registrar ventas\n";
+        cout << "5. Mostrar matriz de ventas\n";
+        cout << "6. Consultar reportes\n";
+        cout << "7. Gestionar productos\n";
+        cout << "8. Gestionar empleados\n";
+        cout << "9. Guardar datos\n";
+        cout << "10. Cargar datos\n";
         cout << "0. Salir\n";
-        if (leerEntero("Seleccione una opcion: ", opcion, 0, 7) == false) break;
+        if (leerEntero("Seleccione una opcion: ", opcion, 0, 10) == false) break;
         switch (opcion) {
-        case 1:
-            menuTiendas(tiendas, numTiendas, matrizVentas, numDias);
+        case 1: {
+            int tiendasAntes = numTiendas;
+            registrarTienda(tiendas, numTiendas);
+            if (numTiendas > tiendasAntes && matrizVentas != nullptr) {
+                crearMatrizVentas(matrizVentas, tiendasAntes, numDias, numTiendas, numDias);
+            }
             break;
+        }
         case 2:
-            menuVentas(tiendas, numTiendas, matrizVentas, numDias);
+            mostrarTiendas(tiendas, numTiendas);
             break;
         case 3:
-            menuReportes(tiendas, numTiendas, matrizVentas, numDias);
+            modificarTienda(tiendas, numTiendas);
             break;
-        case 4:
-            menuProductos(productos, numProductos);
+        case 4: {
+            if (numTiendas == 0) {
+                cout << "[Error] Primero debe registrar al menos una tienda.\n";
+                break;
+            }
+            int nuevosDias;
+            if (leerEntero("Numero de dias a evaluar: ", nuevosDias, 1, 366) == false) break;
+            crearMatrizVentas(matrizVentas, numTiendas, numDias, numTiendas, nuevosDias);
+            numDias = nuevosDias;
+            registrarVentas(matrizVentas, tiendas, numTiendas, numDias);
             break;
+        }
         case 5:
-            menuEmpleados(empleados, numEmpleados, tiendas, numTiendas);
+            mostrarMatrizVentas(matrizVentas, tiendas, numTiendas, numDias);
             break;
         case 6:
-            guardarDatos(tiendas, numTiendas, matrizVentas, numDias, productos, numProductos, empleados, numEmpleados);
+            menuReportes(tiendas, numTiendas, matrizVentas, numDias);
             break;
         case 7:
+            menuProductos(productos, numProductos);
+            break;
+        case 8:
+            menuEmpleados(empleados, numEmpleados, tiendas, numTiendas);
+            break;
+        case 9:
+            guardarDatos(tiendas, numTiendas, matrizVentas, numDias, productos, numProductos, empleados, numEmpleados);
+            break;
+        case 10:
             cargarDatos(tiendas, numTiendas, matrizVentas, numDias, productos, numProductos, empleados, numEmpleados);
             break;
         case 0:
